@@ -17,12 +17,21 @@ export default function TabsLayout() {
         name="index"
         options={{ 
             headerTitle: "Games",
+            title: "Games",
             tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "library" : "library-outline"} size={24} color={color} />,
+            }} />
+      <Tabs.Screen 
+        name="playerGames" 
+        options={{
+            headerTitle: "Logs",
+            title: "My Games",
+            tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "book" : "book-outline"} size={24} color={color} />,
             }} />
       <Tabs.Screen 
         name="profile" 
         options={{ 
-            headerTitle: "Profile", 
+            headerTitle: "Profile",
+            title: "Profile",
             tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "person" : "person-outline"} size={24} color={color} />,
             }} />
     </Tabs>

@@ -24,7 +24,7 @@ export default function TabsLayout() {
         name="playerGames" 
         options={{
             headerTitle: "Logs",
-            title: "My Games",
+            title: "Logs",
             tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "book" : "book-outline"} size={24} color={color} />,
             }} />
       <Tabs.Screen 

@@ -38,31 +38,31 @@ export function AuthProvider({ children }: PropsWithChildren) {
     };
 
     //fetch user information from api
-    const fetchUserInfo = async () => {
-        try {
-            const response = await fetch("https://example.com/api/userinfo", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            const data = await response.json();
-            const fetchedUserId = data.userId;
-            setUserId(fetchedUserId);
-            await storeUserInfo(fetchedUserId);
-        } catch (error) {
-            console.error("Failed to fetch user info", error);
-        }
-    };
+    // const fetchUserInfo = async () => {
+    //     try {
+    //         const response = await fetch("https://example.com/api/userinfo", {
+    //             method: "GET",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //         });
+    //         const data = await response.json();
+    //         const fetchedUserId = data.userId;
+    //         setUserId(fetchedUserId);
+    //         await storeUserInfo(fetchedUserId);
+    //     } catch (error) {
+    //         console.error("Failed to fetch user info", error);
+    //     }
+    // };
 
-    //store user information upon login
-    const storeUserInfo = async (newUserId: number) => {
-        try {
-            await AsyncStorage.setItem("userId", JSON.stringify(newUserId));
-        } catch (error) {
-            console.error("Failed to store user info", error);
-        }
-    };
+    // //store user information upon login
+    // const storeUserInfo = async (newUserId: number) => {
+    //     try {
+    //         await AsyncStorage.setItem("userId", JSON.stringify(newUserId));
+    //     } catch (error) {
+    //         console.error("Failed to store user info", error);
+    //     }
+    // };
 
     const logIn = () => {   
         setIsLoggedIn(true);

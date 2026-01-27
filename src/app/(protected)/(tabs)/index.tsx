@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	titleText: {
-		fontSize: 30,
+		fontSize: 24,
 	},
 	listItems: {
 		fontSize: 20,

@@ -26,7 +26,7 @@ function PlayerGames({ gameLogs }: { gameLogs?: any[] }) {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.headerText}>History</Text>
+			<Text style={styles.titleText}>History</Text>
 			<FlatList
 				data={gameLogs}
 				keyExtractor={(item, index) => index.toString()}
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-	headerText: {
+	titleText: {
 		fontSize: 24,
 	},
 	listItem: {

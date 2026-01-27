@@ -39,14 +39,14 @@ const styles = StyleSheet.create({
 	},
 	listItems: {
 		fontSize: 20,
-		marginVertical: 5,
 
-		borderColor: "black",
-		borderWidth: 1,
+		marginVertical: 5,
 		padding: 5,
+		borderWidth: 1,
+		borderColor: "#ccc",
+		borderRadius: 5,
 		width: 300,
 		textAlign: "center",
 		backgroundColor: "#f0f0f0",
-		borderRadius: 10,
 	},
 });

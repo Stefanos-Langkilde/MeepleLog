@@ -18,6 +18,33 @@ export const apiFetch = async (endpoint: string, options?: RequestInit) => {
 	return response.json();
 };
 
+//fetch player game logs from api
+export function useFetchNemesisPlayerGameLogs(
+	userId: number | null | undefined,
+) {
+	const [gameLogs, setGameLogs] = useState([]);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const data = await apiFetch(
+					`/GameSession/NemesisGameSessions/${userId}`,
+					{
+						method: "GET",
+					},
+				);
+				setGameLogs(data);
+			} catch (error) {
+				console.error("Failed to fetch player game logs", error);
+			}
+		};
+
+		fetchData();
+	}, [userId]);
+
+	return gameLogs;
+}
+
 //fetch boardgames from api
 //For post req: apiFetch('/api/games', { method: 'POST', body: JSON.stringify(data) })
 export function useFetchBoardGames() {
@@ -29,14 +56,14 @@ export function useFetchBoardGames() {
 				// Check AsyncStorage first
 				const cachedData = await AsyncStorage.getItem("boardgames");
 				if (cachedData) {
-					console.log("Loading boardgames from cache:", cachedData);
+					// console.log("Loading boardgames from cache:", cachedData);
 					setBoardgames(JSON.parse(cachedData));
 					return;
 				}
 
 				// If no cache, fetch from API
 				const data = await apiFetch("/Boardgame");
-				console.log("Fetched boardgames from API:", data);
+				// console.log("Fetched boardgames from API:", data);
 				setBoardgames(data);
 				await AsyncStorage.setItem("boardgames", JSON.stringify(data));
 			} catch (error) {

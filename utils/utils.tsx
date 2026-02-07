@@ -45,6 +45,27 @@ export function useFetchNemesisPlayerGameLogs(
 	return gameLogs;
 }
 
+//fetch user info from api
+export function useFetchUserInfo(userId: number) {
+	const [userInfo, setUserInfo] = useState<any>(null);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const data = await apiFetch(`/Users/${userId}`, { method: "GET" });
+				setUserInfo(data);
+				await AsyncStorage.setItem("userInfo", JSON.stringify(data));
+			} catch (error) {
+				console.error("Failed to fetch user info", error);
+			}
+		};
+
+		fetchData();
+	}, [userId]);
+
+	return userInfo;
+}
+
 //fetch boardgames from api
 //For post req: apiFetch('/api/games', { method: 'POST', body: JSON.stringify(data) })
 export function useFetchBoardGames() {

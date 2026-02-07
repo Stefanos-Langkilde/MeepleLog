@@ -5,6 +5,7 @@ import { createContext, PropsWithChildren, useEffect, useState } from "react";
 SplashScreen.preventAutoHideAsync();
 
 type AuthState = {
+	deleteAccount(): unknown;
 	isLoggedIn: boolean;
 	isReady: boolean;
 	logIn: () => void;
@@ -20,6 +21,7 @@ export const AuthContext = createContext<AuthState>({
 	logIn: () => {},
 	logOut: () => {},
 	userId: null,
+	deleteAccount: () => {},
 });
 
 export function AuthProvider({ children }: PropsWithChildren) {
@@ -81,6 +83,21 @@ export function AuthProvider({ children }: PropsWithChildren) {
 		getAuthFromStorage();
 	}, []);
 
+	//delete account function
+	const deleteAccount = async () => {
+		try {
+			// Here you would typically make an API call to delete the account on the server
+			// For this example, we'll just clear the local storage and log out
+			await AsyncStorage.removeItem(authStorageKey);
+			await AsyncStorage.removeItem("userId");
+			setIsLoggedIn(false);
+			setUserId(null);
+			router.replace("/login");
+		} catch (error) {
+			console.error("Failed to delete account", error);
+		}
+	};
+
 	useEffect(() => {
 		if (isReady) {
 			SplashScreen.hideAsync();
@@ -95,6 +112,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 				logIn,
 				logOut,
 				userId,
+				deleteAccount,
 			}}
 		>
 			{children}

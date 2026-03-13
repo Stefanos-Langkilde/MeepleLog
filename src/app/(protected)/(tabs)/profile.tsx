@@ -9,37 +9,40 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Profile() {
 	const authState = useContext(AuthContext);
 	const userInfo = useFetchUserInfo(authState.userId!);
 
-	if (!userInfo) {
-		return (
-			<View style={styles.container}>
-				<Text style={styles.titleText}>Loading...</Text>
-			</View>
-		);
-	}
-
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			<Text style={styles.titleText}>Your information:</Text>
-			<View style={styles.playerInfoContainer}>
-				<Text style={styles.textSize}>Your user ID is: {userInfo[0]?.id}</Text>
-				<Text style={styles.textSize}>
-					Your username is: {userInfo[0]?.username}
-				</Text>
-				<Text style={styles.textSize}>Your Email is: {userInfo[0]?.email}</Text>
-				<Text style={styles.textSize}>
-					Joined: {new Date(userInfo[0]?.createdAt).toLocaleDateString()}
-				</Text>
-				{userInfo[0]?.updatedAt && (
+			{userInfo ? (
+				<View style={styles.playerInfoContainer}>
 					<Text style={styles.textSize}>
-						Last Updated:{" "}
-						{new Date(userInfo[0]?.updatedAt).toLocaleDateString()}
+						Your user ID is: {userInfo[0]?.id}
 					</Text>
-				)}
+					<Text style={styles.textSize}>
+						Your username is: {userInfo[0]?.username}
+					</Text>
+					<Text style={styles.textSize}>
+						Your Email is: {userInfo[0]?.email}
+					</Text>
+					<Text style={styles.textSize}>
+						Joined: {new Date(userInfo[0]?.createdAt).toLocaleDateString()}
+					</Text>
+					{userInfo[0]?.updatedAt && (
+						<Text style={styles.textSize}>
+							Last Updated:{" "}
+							{new Date(userInfo[0]?.updatedAt).toLocaleDateString()}
+						</Text>
+					)}
+				</View>
+			) : (
+				<Text style={styles.titleText}>Loading...</Text>
+			)}
+			<View style={{ marginTop: 20 }}>
 				<Button title="Log Out" onPress={() => authState.logOut()} />
 			</View>
 			<View style={styles.deleteButtonContainer}>
@@ -67,19 +70,17 @@ export default function Profile() {
 					<Text style={styles.deleteButtonText}>Delete Account</Text>
 				</TouchableOpacity>
 			</View>
-		</View>
+		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
+		flex: 1,
 		flexDirection: "column",
-		padding: 3,
 		alignItems: "center",
 		justifyContent: "flex-start",
-		borderRadius: 8,
 		backgroundColor: "#f2f2f2",
-		height: "100%",
 	},
 	titleText: {
 		fontSize: 24,

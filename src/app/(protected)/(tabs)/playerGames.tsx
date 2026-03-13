@@ -9,6 +9,7 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 function PlayerGames({ gameLogs }: { gameLogs?: any[] }) {
 	const [selectedGame, setSelectedGame] = useState<any>(null);
@@ -25,7 +26,7 @@ function PlayerGames({ gameLogs }: { gameLogs?: any[] }) {
 	};
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			<Text style={styles.titleText}>History</Text>
 			<FlatList
 				data={gameLogs}
@@ -119,7 +120,7 @@ function PlayerGames({ gameLogs }: { gameLogs?: any[] }) {
 					</View>
 				</Modal>
 			)}
-		</View>
+		</SafeAreaView>
 	);
 }
 
@@ -133,8 +134,7 @@ export default function PlayerGamesScreen() {
 
 const styles = StyleSheet.create({
 	container: {
-		padding: 3,
-		justifyContent: "center",
+		flex: 1,
 		alignItems: "center",
 		backgroundColor: "#f2f2f2",
 	},

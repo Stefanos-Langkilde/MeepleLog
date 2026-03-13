@@ -99,14 +99,13 @@ export function useFetchBoardGames() {
 }
 
 export async function createGameSession(
-	boardgameId: number,
-	gameSuccessor: boolean,
+	missionSuccess: boolean,
 	notes: string,
 ) {
 	try {
 		const response = await apiFetch("/GameSession/NemesisGameSession", {
 			method: "POST",
-			body: JSON.stringify({ boardgameId, gameSuccessor, notes }),
+			body: JSON.stringify({ gameSuccess: missionSuccess, notes }),
 		});
 		return response;
 	} catch (error) {

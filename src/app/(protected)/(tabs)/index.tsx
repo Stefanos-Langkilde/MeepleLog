@@ -1,4 +1,4 @@
-import SessionPlayerCard from "@/src/components/SessionPlayerCard";
+import NemesisPlayerCard from "@/src/components/NemesisPlayerCard";
 import { useFetchBoardGames } from "@/utils/utils";
 import { useState } from "react";
 import {
@@ -241,7 +241,7 @@ export default function Index() {
 															padding: 10,
 														}}
 													>
-														<SessionPlayerCard playerNumber={i + 1} />
+														<NemesisPlayerCard playerNumber={i + 1} />
 													</View>
 												))}
 											</View>

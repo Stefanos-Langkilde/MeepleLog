@@ -1,14 +1,17 @@
-import React, { useState } from "react";
-import { StyleSheet, Switch, Text, TextInput, View } from "react-native";
+import { apiFetch } from "@/utils/utils";
+import React, { useEffect, useState } from "react";
+import { Alert, StyleSheet, Switch, Text, TextInput, View } from "react-native";
+import NemesisDeathDropdown from "./NemesisDeathDropdown";
 
 interface PlayerCardProps {
 	playerNumber: number;
 }
 
-const SessionPlayerCard: React.FC<PlayerCardProps> = ({ playerNumber }) => {
+const NemesisPlayerCard: React.FC<PlayerCardProps> = ({ playerNumber }) => {
 	const [personalMissionSuccess, setPersonalMissionSuccess] = useState(false);
 	const [playerDeath, setPlayerDeath] = useState(false);
 	const [playerId, setPlayerId] = useState("");
+	const [confirmedPlayerId, setConfirmedPlayerId] = useState("");
 	const [username, setUsername] = useState("");
 	const [character, setCharacter] = useState("");
 
@@ -20,13 +23,30 @@ const SessionPlayerCard: React.FC<PlayerCardProps> = ({ playerNumber }) => {
 		setPlayerDeath(!playerDeath);
 	};
 
-	//dropdown states here
-	const [open, setOpen] = useState(false);
-	const [value, setValue] = useState(null);
-	const [items, setItems] = useState([
-		{ label: "Apple", value: "apple" },
-		{ label: "Banana", value: "banana" },
-	]);
+	const handleConfirmPlayerId = () => {
+		setConfirmedPlayerId(playerId);
+	};
+
+	//fetch user info from api in utils and set username state to the username of the user with the id of playerId
+	useEffect(() => {
+		const fetchUserInfo = async () => {
+			if (confirmedPlayerId) {
+				try {
+					const data = await apiFetch(`/Users/${confirmedPlayerId}`, {
+						method: "GET",
+					});
+					setUsername(data[0].username);
+				} catch (error) {
+					Alert.alert("User not found", "Failed to fetch user info");
+					setPlayerId("");
+					setUsername("");
+					console.error("Failed to fetch user info", error);
+				}
+			}
+		};
+
+		fetchUserInfo();
+	}, [confirmedPlayerId]);
 
 	return (
 		<View style={styles.playerCardContainer}>
@@ -45,22 +65,13 @@ const SessionPlayerCard: React.FC<PlayerCardProps> = ({ playerNumber }) => {
 					placeholder={`Player ${playerNumber} ID`}
 					value={playerId}
 					onChangeText={setPlayerId}
+					onSubmitEditing={handleConfirmPlayerId}
+					returnKeyType="done"
 				/>
 			</View>
 			<View style={styles.playerNameInputContainer}>
 				<Text>Username:</Text>
-				<TextInput
-					style={{
-						borderWidth: 1,
-						borderColor: "#ccc",
-						padding: 5,
-						borderRadius: 5,
-						width: "60%",
-					}}
-					placeholder={`Player ${playerNumber} username`}
-					value={username}
-					onChangeText={setUsername}
-				/>
+				{username && <Text style={{ marginLeft: 10 }}>{username}</Text>}
 			</View>
 			<View style={styles.playerCharacterInputContainer}>
 				<Text>Character:</Text>
@@ -107,8 +118,7 @@ const SessionPlayerCard: React.FC<PlayerCardProps> = ({ playerNumber }) => {
 			</View>
 			{playerDeath && (
 				<View style={styles.playerDiedContainer}>
-					<Text>Cause of Death:</Text>
-					{/* Add input for cause of death if needed */}
+					<NemesisDeathDropdown />
 				</View>
 			)}
 		</View>
@@ -129,6 +139,16 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 5,
+	},
+	confirmButton: {
+		backgroundColor: "#007bff",
+		paddingVertical: 5,
+		paddingHorizontal: 10,
+		borderRadius: 5,
+	},
+	confirmButtonText: {
+		color: "#fff",
+		fontWeight: "bold",
 	},
 	playerNameInputContainer: {
 		flexDirection: "row",
@@ -159,4 +179,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default SessionPlayerCard;
+export default NemesisPlayerCard;

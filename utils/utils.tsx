@@ -113,3 +113,31 @@ export async function createGameSession(
 		throw error;
 	}
 }
+
+export function useFetchDeathTypes() {
+	const [deathTypes, setDeathTypes] = useState([]);
+
+	useEffect(() => {
+		const fetchDeathInfo = async () => {
+			try {
+				// Check AsyncStorage first
+				const cachedData = await AsyncStorage.getItem("deathTypes");
+				if (cachedData) {
+					setDeathTypes(JSON.parse(cachedData));
+					return;
+				}
+
+				// If no cache, fetch from API
+				const data = await apiFetch(`/Nemesis/deaths`, { method: "GET" });
+				setDeathTypes(data);
+				await AsyncStorage.setItem("deathTypes", JSON.stringify(data));
+			} catch (error) {
+				console.error("Error fetching death info:", error);
+			}
+		};
+
+		fetchDeathInfo();
+	}, []);
+
+	return deathTypes;
+}

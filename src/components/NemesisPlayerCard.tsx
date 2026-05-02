@@ -1,5 +1,5 @@
 import { apiFetch } from "@/utils/utils";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useImperativeHandle, useState } from "react";
 import { Alert, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import NemesisDeathDropdown from "./NemesisDeathDropdown";
 
@@ -7,7 +7,20 @@ interface PlayerCardProps {
 	playerNumber: number;
 }
 
-const NemesisPlayerCard: React.FC<PlayerCardProps> = ({ playerNumber }) => {
+export interface NemesisPlayerCardRef {
+	getPlayerData: () => {
+		playerId: string;
+		username: string;
+		character: string;
+		personalMissionSuccess: boolean;
+		playerDeath: boolean;
+	};
+}
+
+const NemesisPlayerCard = React.forwardRef<
+	NemesisPlayerCardRef,
+	PlayerCardProps
+>(({ playerNumber }, ref) => {
 	const [personalMissionSuccess, setPersonalMissionSuccess] = useState(false);
 	const [playerDeath, setPlayerDeath] = useState(false);
 	const [playerId, setPlayerId] = useState("");
@@ -26,6 +39,16 @@ const NemesisPlayerCard: React.FC<PlayerCardProps> = ({ playerNumber }) => {
 	const handleConfirmPlayerId = () => {
 		setConfirmedPlayerId(playerId);
 	};
+
+	useImperativeHandle(ref, () => ({
+		getPlayerData: () => ({
+			playerId,
+			username,
+			character,
+			personalMissionSuccess,
+			playerDeath,
+		}),
+	}));
 
 	//fetch user info from api in utils and set username state to the username of the user with the id of playerId
 	useEffect(() => {
@@ -123,7 +146,9 @@ const NemesisPlayerCard: React.FC<PlayerCardProps> = ({ playerNumber }) => {
 			)}
 		</View>
 	);
-};
+});
+
+NemesisPlayerCard.displayName = "NemesisPlayerCard";
 
 const styles = StyleSheet.create({
 	playerCardContainer: {

@@ -37,7 +37,7 @@ function PlayerGames({ gameLogs }: { gameLogs?: any[] }) {
 						onPress={() => openModal(item)}
 					>
 						<View style={styles.listSubItem}>
-							<Text>Boardgame id: {item.boardgameId}</Text>
+							<Text style={styles.gameText}>{item.boardgameName}</Text>
 							<Text>Date: {new Date(item.createdAt).toLocaleDateString()}</Text>
 						</View>
 						<View style={styles.listSubItem}>
@@ -66,8 +66,8 @@ function PlayerGames({ gameLogs }: { gameLogs?: any[] }) {
 										justifyContent: "space-between",
 									}}
 								>
-									<Text style={styles.modalText}>
-										Game ID: {selectedGame.id}
+									<Text style={styles.gameText}>
+										{selectedGame.boardgameName}
 									</Text>
 									<Text style={styles.modalText}>
 										Date:{" "}
@@ -155,6 +155,10 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		fontSize: 14,
 		color: "#555",
+	},
+	gameText: {
+		fontSize: 16,
+		fontWeight: "bold",
 	},
 	modalContainer: {
 		flex: 1,

@@ -1,16 +1,18 @@
-import NemesisPlayerCard from "@/src/components/NemesisPlayerCard";
-import { useFetchBoardGames } from "@/utils/utils";
-import { useState } from "react";
+import NemesisPlayerCard, {
+    NemesisPlayerCardRef,
+} from "@/src/components/NemesisPlayerCard";
+import { apiFetch, useFetchBoardGames } from "@/utils/utils";
+import { useRef, useState } from "react";
 import {
-	FlatList,
-	Modal,
-	ScrollView,
-	StyleSheet,
-	Switch,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View,
+    FlatList,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -43,9 +45,34 @@ export default function Index() {
 	};
 
 	//When starting session, create new fetch
-	const saveSession = () => {
-		// Implement session start logic here
-		setSessionId(1);
+	const saveSession = async () => {
+		// Collect all player data
+		const playersData = playerRefs.current
+			.slice(0, playerCount)
+			.map((ref) => ref?.getPlayerData())
+			.filter(Boolean);
+
+		// Combine with session data
+		const sessionData = {
+			gameId: selectedGame.id,
+			missionSuccess,
+			notes: "", // Add notes state if needed
+			playerCount,
+			players: playersData,
+		};
+
+		// Make the fetch call
+		try {
+			const response = await apiFetch("/sessions", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(sessionData),
+			});
+			console.log("Session saved:", response);
+			closeModal();
+		} catch (error) {
+			console.error("Failed to save session:", error);
+		}
 	};
 
 	//player count logic here, can be incremented/decremented with buttons
@@ -64,6 +91,8 @@ export default function Index() {
 			setPlayerCount(playerCount - 1);
 		}
 	};
+
+	const playerRefs = useRef<(NemesisPlayerCardRef | null)[]>([]);
 
 	return (
 		<SafeAreaView style={styles.container}>

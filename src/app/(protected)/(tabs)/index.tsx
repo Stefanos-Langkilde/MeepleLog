@@ -1,18 +1,18 @@
 import NemesisPlayerCard, {
-    NemesisPlayerCardRef,
-} from "@/src/components/NemesisPlayerCard";
-import { apiFetch, useFetchBoardGames } from "@/utils/utils";
+	NemesisPlayerCardRef,
+} from "@/src/components/nemesisPlayerCard";
+import { createGameSession, useFetchBoardGames } from "@/utils/utils";
 import { useRef, useState } from "react";
 import {
-    FlatList,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+	FlatList,
+	Modal,
+	ScrollView,
+	StyleSheet,
+	Switch,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -20,10 +20,6 @@ export default function Index() {
 	const boardgames = useFetchBoardGames();
 	const [selectedGame, setSelectedGame] = useState<any>(null);
 	const [modalVisible, setModalVisible] = useState(false);
-
-	//check for session id
-	const [sessionId, setSessionId] = useState<number | null>(null);
-
 	const [missionSuccess, setMissionSuccess] = useState(false);
 
 	//switches go here
@@ -46,32 +42,33 @@ export default function Index() {
 
 	//When starting session, create new fetch
 	const saveSession = async () => {
-		// Collect all player data
-		const playersData = playerRefs.current
+		// Collect all player data from mounted player cards
+		const playerStats = playerRefs.current
 			.slice(0, playerCount)
 			.map((ref) => ref?.getPlayerData())
 			.filter(Boolean);
 
+		if (playerStats.length === 0) {
+			alert("Please add player information before saving the session.");
+			return;
+		}
+
 		// Combine with session data
 		const sessionData = {
-			gameId: selectedGame.id,
-			missionSuccess,
-			notes: "", // Add notes state if needed
-			playerCount,
-			players: playersData,
+			boardgameId: selectedGame.id,
+			success: missionSuccess ? 1 : 0,
+			notes: "",
+			playerStats,
 		};
 
-		// Make the fetch call
+		console.log("Session data saved:", sessionData);
 		try {
-			const response = await apiFetch("/sessions", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(sessionData),
-			});
-			console.log("Session saved:", response);
+			await createGameSession(sessionData);
+			alert("Session saved successfully!");
 			closeModal();
 		} catch (error) {
-			console.error("Failed to save session:", error);
+			console.error("Error saving session:", error);
+			alert("An error occurred while saving the session.");
 		}
 	};
 
@@ -93,6 +90,10 @@ export default function Index() {
 	};
 
 	const playerRefs = useRef<(NemesisPlayerCardRef | null)[]>([]);
+	const setPlayerRef =
+		(index: number) => (ref: NemesisPlayerCardRef | null) => {
+			playerRefs.current[index] = ref;
+		};
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -127,7 +128,7 @@ export default function Index() {
 							<ScrollView
 								style={{
 									width: "100%",
-									maxHeight: "90%",
+									maxHeight: "95%",
 								}}
 							>
 								<View style={styles.modalContent}>
@@ -270,7 +271,10 @@ export default function Index() {
 															padding: 10,
 														}}
 													>
-														<NemesisPlayerCard playerNumber={i + 1} />
+														<NemesisPlayerCard
+															ref={setPlayerRef(i)}
+															playerNumber={i + 1}
+														/>
 													</View>
 												))}
 											</View>
@@ -353,6 +357,7 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		padding: 20,
 		width: "90%",
+		height: "85%",
 		alignItems: "center",
 	},
 	modalContent: {

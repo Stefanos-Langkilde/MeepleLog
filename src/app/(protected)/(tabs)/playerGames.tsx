@@ -105,9 +105,6 @@ function PlayerGames({ gameLogs }: { gameLogs?: any[] }) {
 											{item.personalMissionSuccess ? "Yes" : "No"}
 										</Text>
 										<Text style={styles.modalText}>
-											Died: {item.playerDied ? "Yes" : "No"}
-										</Text>
-										<Text style={styles.modalText}>
 											Fate: {item.nemesisDeathName}
 										</Text>
 									</View>

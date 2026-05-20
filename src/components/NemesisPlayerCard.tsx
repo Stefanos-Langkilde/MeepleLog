@@ -1,7 +1,8 @@
 import { apiFetch } from "@/utils/utils";
 import React, { useEffect, useImperativeHandle, useState } from "react";
 import { Alert, StyleSheet, Switch, Text, TextInput, View } from "react-native";
-import NemesisDeathDropdown from "./NemesisDeathDropdown";
+import NemesisCharacterDropdown from "./nemesisCharacterDropdown";
+import NemesisDeathDropdown from "./nemesisDeathDropdown";
 
 interface PlayerCardProps {
 	playerNumber: number;
@@ -9,11 +10,13 @@ interface PlayerCardProps {
 
 export interface NemesisPlayerCardRef {
 	getPlayerData: () => {
-		playerId: string;
-		username: string;
-		character: string;
+		playerId: number;
+		playerUsername: string;
 		personalMissionSuccess: boolean;
-		playerDeath: boolean;
+		nemesisCharacterId: number | null;
+		characterName: string | null;
+		nemesisDeathTypesId: number | null;
+		nemesisDeathName: string | null;
 	};
 }
 
@@ -22,18 +25,20 @@ const NemesisPlayerCard = React.forwardRef<
 	PlayerCardProps
 >(({ playerNumber }, ref) => {
 	const [personalMissionSuccess, setPersonalMissionSuccess] = useState(false);
-	const [playerDeath, setPlayerDeath] = useState(false);
 	const [playerId, setPlayerId] = useState("");
 	const [confirmedPlayerId, setConfirmedPlayerId] = useState("");
 	const [username, setUsername] = useState("");
-	const [character, setCharacter] = useState("");
+	const [selectedCharacter, setSelectedCharacter] = useState<{
+		id: number;
+		name: string;
+	} | null>(null);
+	const [selectedDeath, setSelectedDeath] = useState<{
+		id: number;
+		name: string;
+	} | null>(null);
 
 	const togglePersonalMissionSwitch = () => {
 		setPersonalMissionSuccess(!personalMissionSuccess);
-	};
-
-	const togglePlayerDeathSwitch = () => {
-		setPlayerDeath(!playerDeath);
 	};
 
 	const handleConfirmPlayerId = () => {
@@ -42,11 +47,13 @@ const NemesisPlayerCard = React.forwardRef<
 
 	useImperativeHandle(ref, () => ({
 		getPlayerData: () => ({
-			playerId,
-			username,
-			character,
+			playerId: parseInt(playerId, 10) || 0,
+			playerUsername: username,
 			personalMissionSuccess,
-			playerDeath,
+			nemesisCharacterId: selectedCharacter?.id || null,
+			characterName: selectedCharacter?.name || null,
+			nemesisDeathTypesId: selectedDeath?.id || null,
+			nemesisDeathName: selectedDeath?.name || null,
 		}),
 	}));
 
@@ -98,18 +105,9 @@ const NemesisPlayerCard = React.forwardRef<
 			</View>
 			<View style={styles.playerCharacterInputContainer}>
 				<Text>Character:</Text>
-				<TextInput
-					style={{
-						borderWidth: 1,
-						borderColor: "#ccc",
-						padding: 5,
-						borderRadius: 5,
-						width: "50%",
-					}}
-					placeholder={`Player ${playerNumber} character`}
-					value={character}
-					onChangeText={setCharacter}
-				/>
+				<View>
+					<NemesisCharacterDropdown onSelect={setSelectedCharacter} />
+				</View>
 			</View>
 			<View style={styles.personalMissionContainer}>
 				<Text>Personal Mission: </Text>
@@ -127,23 +125,10 @@ const NemesisPlayerCard = React.forwardRef<
 			</View>
 			<View style={styles.playerFateContainer}>
 				<Text>Fate:</Text>
-				<Text>{playerDeath ? "Deceased" : "Survived"}</Text>
-				<Switch
-					trackColor={{
-						false: "#53b63f",
-						true: "#ff4d4d",
-					}}
-					thumbColor={playerDeath ? "#f4f3f4" : "#f4f3f4"}
-					ios_backgroundColor="#3e3e3e"
-					onValueChange={togglePlayerDeathSwitch}
-					value={playerDeath}
-				/>
-			</View>
-			{playerDeath && (
-				<View style={styles.playerDiedContainer}>
-					<NemesisDeathDropdown />
+				<View>
+					<NemesisDeathDropdown onSelect={setSelectedDeath} />
 				</View>
-			)}
+			</View>
 		</View>
 	);
 });
@@ -183,7 +168,7 @@ const styles = StyleSheet.create({
 	playerCharacterInputContainer: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 5,
+		justifyContent: "space-between",
 	},
 	personalMissionContainer: {
 		flexDirection: "row",
@@ -195,12 +180,6 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "space-between",
-		height: 30,
-	},
-	playerDiedContainer: {
-		flexDirection: "column",
-		alignItems: "center",
-		gap: 5,
 	},
 });
 

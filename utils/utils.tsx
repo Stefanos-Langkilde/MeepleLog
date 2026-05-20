@@ -13,7 +13,18 @@ export const apiFetch = async (endpoint: string, options?: RequestInit) => {
 		...options,
 	});
 	if (!response.ok) {
-		throw new Error(`API error: ${response.status}`);
+		const errorText = await response.text();
+		let detail = errorText;
+		try {
+			detail = JSON.parse(errorText);
+		} catch {
+			// not JSON
+		}
+		throw new Error(
+			`API error: ${response.status} ${response.statusText} - ${
+				typeof detail === "string" ? detail : JSON.stringify(detail)
+			}`,
+		);
 	}
 	return response.json();
 };
@@ -98,24 +109,31 @@ export function useFetchBoardGames() {
 	return boardgames;
 }
 
-export async function createGameSession(
-	missionSuccess: boolean,
-	notes: string,
-) {
+export async function createGameSession(sessionData: any) {
+	if (!sessionData) {
+		throw new Error("Missing session data");
+	}
+
 	try {
-		const response = await apiFetch("/GameSession/NemesisGameSession", {
+		const response = await apiFetch("/GameSession/Nemesis/CreateWithPlayers", {
 			method: "POST",
-			body: JSON.stringify({ gameSuccess: missionSuccess, notes }),
+			body: JSON.stringify(sessionData),
 		});
+		console.log("Session saved:", response);
 		return response;
 	} catch (error) {
-		console.error("Failed to create game session", error);
+		console.error("Failed to save session:", error);
 		throw error;
 	}
 }
 
-export function useFetchDeathTypes() {
-	const [deathTypes, setDeathTypes] = useState([]);
+type DeathType = {
+	id: number;
+	deathType: string;
+};
+
+export function useFetchDeathTypes(): DeathType[] {
+	const [deathTypes, setDeathTypes] = useState<DeathType[]>([]);
 
 	useEffect(() => {
 		const fetchDeathInfo = async () => {
@@ -140,4 +158,37 @@ export function useFetchDeathTypes() {
 	}, []);
 
 	return deathTypes;
+}
+
+type NemesisCharacter = {
+	id: number;
+	name: string;
+};
+
+export function useFetchNemesisCharacters(): NemesisCharacter[] {
+	const [characters, setCharacters] = useState<NemesisCharacter[]>([]);
+
+	useEffect(() => {
+		const fetchCharacters = async () => {
+			try {
+				// Check AsyncStorage first
+				const cachedData = await AsyncStorage.getItem("nemesisCharacters");
+				if (cachedData) {
+					setCharacters(JSON.parse(cachedData));
+					return;
+				}
+
+				// If no cache, fetch from API
+				const data = await apiFetch(`/Nemesis/characters`, { method: "GET" });
+				setCharacters(data);
+				await AsyncStorage.setItem("nemesisCharacters", JSON.stringify(data));
+			} catch (error) {
+				console.error("Error fetching nemesis characters:", error);
+			}
+		};
+
+		fetchCharacters();
+	}, []);
+
+	return characters;
 }
